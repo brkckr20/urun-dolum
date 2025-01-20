@@ -45,7 +45,7 @@
                                 <th>Sil</th>
                             </tr>
                         </thead>
-                        <tbody class="table-group-divider">
+                        <tbody class="table-group-divider" style="font-size: 15px;">
                             <tr v-for="entry in dailyEntries" :key="entry.id">
                                 <td>{{ entry.materialName }}</td>
                                 <td>{{ entry.quantity }}</td>

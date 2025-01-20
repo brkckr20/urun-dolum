@@ -23,19 +23,17 @@
                         <thead>
                             <tr>
                                 <th>Malzeme Adı</th>
-                                <th>Birim</th>
                                 <th>İşlemler</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="font-size: 15px;">
                             <tr v-for="material in materials" :key="material.id">
                                 <td>{{ material.name }}</td>
-                                <td>{{ material.unit }}</td>
                                 <td>
-                                    <button @click="editMaterial(material)"
-                                        class="btn btn-sm btn-warning me-2">Düzenle</button>
-                                    <button @click="deleteMaterial(material.id)"
-                                        class="btn btn-sm btn-danger">Sil</button>
+                                    <button @click="editMaterial(material)" class="btn btn-sm btn-warning me-2"><i
+                                            class="bi bi-pencil-fill"></i></button>
+                                    <button @click="deleteMaterial(material.id)" class="btn btn-sm btn-danger"><i
+                                            class="bi bi-trash-fill"></i></button>
                                 </td>
                             </tr>
                         </tbody>
