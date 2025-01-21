@@ -5,7 +5,8 @@ import EntryScreen from '../components/EntryScreen.vue'
 const routes = [
     {
         path: '/',
-        redirect: '/materials'
+        name: 'home', // İsteğe bağlı bir isim verebilirsiniz
+        component: EntryScreen
     },
     {
         path: '/materials',
