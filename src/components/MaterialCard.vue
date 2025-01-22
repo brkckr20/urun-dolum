@@ -2,7 +2,7 @@
     <div class="container mt-4">
         <div class="card p-0">
             <div class="card-header">
-                <h4>Malzeme Kartı Yönetimi</h4>
+                <h4>Malzeme Kartları</h4>
             </div>
             <div class="card-body">
                 <form @submit.prevent="handleSubmit">
@@ -10,10 +10,10 @@
                         <label class="form-label">Malzeme Adı</label>
                         <input type="text" class="form-control" v-model="materialName" required>
                     </div>
-                    <div class="mb-3">
+                    <!-- <div class="mb-3"> gerektiğinde ekleyebiliriz
                         <label class="form-label">Birim</label>
                         <input type="text" class="form-control" v-model="unit" required>
-                    </div>
+                    </div> -->
                     <button type="submit" class="btn btn-primary">Kaydet</button>
                 </form>
 

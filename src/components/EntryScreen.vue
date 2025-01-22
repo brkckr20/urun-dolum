@@ -231,9 +231,9 @@ const saveEntry = async () => {
 
 // Rapor oluşturma computed property
 const generateReport = computed(() => {
-    const date = formatDate(selectedDate.value)
-    let report = `${date}\n\n`
-
+    //const date = formatDate(selectedDate.value)
+    //let report = `${date}\n\n`
+    let report = ''
     // Malzemeleri grupla
     const groupedEntries = dailyEntries.value.reduce((acc, entry) => {
         if (!acc[entry.materialName]) {
@@ -249,6 +249,8 @@ const generateReport = computed(() => {
     })
 
     // En alta transfer mesajını ekle
+    const totalQuantity = Object.values(groupedEntries).reduce((sum, qty) => sum + qty, 0)
+    report += `\n✅Toplam ${totalQuantity} adet epoksi dolduruldu`
     report += `\n✅Ürünler sisteme girildi transfer yapıldı`
 
     return report
