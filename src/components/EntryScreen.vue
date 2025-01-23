@@ -250,8 +250,8 @@ const generateReport = computed(() => {
 
     // En alta transfer mesajını ekle
     const totalQuantity = Object.values(groupedEntries).reduce((sum, qty) => sum + qty, 0)
-    report += `\n✅Toplam ${totalQuantity} adet epoksi dolduruldu`
     report += `\n✅Ürünler sisteme girildi transfer yapıldı`
+    report += `\n✅Toplam ${totalQuantity} epoksi dolduruldu`
 
     return report
 })
