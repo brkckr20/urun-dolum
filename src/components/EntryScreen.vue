@@ -80,12 +80,14 @@
                                     ref="reportText">{{ generateReport }}</textarea>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
-                                <button type="button" class="btn btn-primary" @click="copyReport">
-                                    <i class="bi bi-clipboard"></i> Kopyala
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-lg"></i>
                                 </button>
-                                <button type="button" class="btn btn-success" @click="shareOnWhatsApp">
-                                    <i class="bi bi-whatsapp"></i> WhatsApp
+                                <button type="button" class="btn btn-primary btn-sm" @click="copyReport">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                                <button type="button" class="btn btn-success btn-sm" @click="shareOnWhatsApp">
+                                    <i class="bi bi-whatsapp"></i>
                                 </button>
                             </div>
                         </div>
