@@ -84,6 +84,9 @@
                                 <button type="button" class="btn btn-primary" @click="copyReport">
                                     <i class="bi bi-clipboard"></i> Kopyala
                                 </button>
+                                <button type="button" class="btn btn-success" @click="shareOnWhatsApp">
+                                    <i class="bi bi-whatsapp"></i> WhatsApp
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -272,6 +275,12 @@ const copyReport = async () => {
     } catch (error) {
         toast.error('Kopyalama işlemi başarısız oldu')
     }
+}
+
+const shareOnWhatsApp = () => {
+    const message = generateReport.value
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
 }
 
 const deleteEntry = async (id) => {
