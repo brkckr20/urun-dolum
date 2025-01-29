@@ -1,4 +1,23 @@
 <template>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary"
+    style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+    <div class=" container">
+      <ul class="navbar-nav d-flex flex-row gap-2">
+        <li class="nav-item">
+          <router-link class="nav-link" to="/materials">🗂️ Ürünler</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" to="/entry">✅ Girişler</router-link>
+        </li>
+        <li class="nav-item">
+        </li>
+    </ul>
+        <p class="text-white m-0">{{ user.toUpperCase() }}</p>
+    </div>
+
+
+
+  </nav>
     <div class="container mt-4">
         <div class="card p-0">
             <div class="card-header">
@@ -20,7 +39,7 @@
                             <input class="form-check-input" type="radio" :id="material.id" :value="material.id"
                                 v-model="selectedMaterial" name="materialRadio">
                             <label class="form-check-label" :for="material.id">
-                                {{ material.name }} ({{ material.unit }})
+                                {{ material.name }}<!--  ({{ material.unit }}) -->
                             </label>
                         </div>
                     </div>
@@ -115,6 +134,10 @@
                                     <label class="form-label">Miktar</label>
                                     <input type="number" class="form-control" v-model="editForm.quantity">
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Kullanıcı</label>
+                                    <input type="text" class="form-control" v-model="editForm.unit">
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
@@ -144,7 +167,7 @@ const selectedDate = ref(new Date())
 const dailyEntries = ref([])
 const reportText = ref(null)
 let reportModal = null
-
+const user = ref('');
 const { withLoading } = useLoading()
 
 // Düzenleme formu için state
@@ -164,14 +187,14 @@ const formatDate = (date) => {
     }).format(date)
 }
 
-const formatTime = (timestamp) => {
+/* const formatTime = (timestamp) => {
     if (!timestamp) return ''
     const date = timestamp.toDate()
     return new Intl.DateTimeFormat('tr-TR', {
         hour: '2-digit',
         minute: '2-digit'
     }).format(date)
-}
+} */
 
 const changeDate = (days) => {
     const newDate = new Date(selectedDate.value)
@@ -199,18 +222,25 @@ const loadDailyEntries = async () => {
                 id: doc.id,
                 ...doc.data()
             }))
+            .filter(entry => entry.unit === user.value)
         } catch (error) {
             toast.error('Kayıtlar yüklenirken bir hata oluştu')
+            console.log(error);
+            
         }
     })
 }
 
 const loadMaterials = async () => {
-    const querySnapshot = await getDocs(collection(db, 'materials'))
-    materials.value = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-    }))
+    const q = query(
+        collection(db, 'materials'),
+        where('unit', '==', user.value)  // 'user' alanı, user.value ile eşit olanları getir
+    )
+    const querySnapshot = await getDocs(q)
+        materials.value = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+  }))
 }
 
 const saveEntry = async () => {
@@ -221,8 +251,10 @@ const saveEntry = async () => {
                 materialId: selectedMaterial.value,
                 materialName: material.name,
                 quantity: Number(quantity.value),
-                date: Timestamp.fromDate(new Date())
+                date: Timestamp.fromDate(new Date()),
+                unit: user.value
             })
+
 
             toast.success('Giriş kaydedildi')
             selectedMaterial.value = null
@@ -256,7 +288,7 @@ const generateReport = computed(() => {
     // En alta transfer mesajını ekle
     const totalQuantity = Object.values(groupedEntries).reduce((sum, qty) => sum + qty, 0)
     report += `\n✅Ürünler sisteme girildi transfer yapıldı`
-    report += `\n✅Toplam ${totalQuantity} epoksi dolduruldu`
+    report += `\n✅${totalQuantity} adet epoksi dolduruldu`
 
     return report
 })
@@ -302,11 +334,13 @@ const editEntry = (entry) => {
     editForm.value = {
         id: entry.id,
         materialId: entry.materialId,
-        quantity: entry.quantity
+        quantity: entry.quantity,
+        unit: entry.unit
     }
     if (!editModal) {
         editModal = new Modal(document.getElementById('editModal'))
     }
+
     editModal.show()
 }
 
@@ -318,8 +352,10 @@ const updateEntry = async () => {
             await updateDoc(doc(db, 'entries', editForm.value.id), {
                 materialId: editForm.value.materialId,
                 materialName: material.name,
-                quantity: Number(editForm.value.quantity)
+                quantity: Number(editForm.value.quantity),
+                unit: user.value
             })
+
 
             toast.success('Kayıt güncellendi')
             editModal.hide()
@@ -335,11 +371,14 @@ watch(selectedDate, () => {
 })
 
 onMounted(() => {
+    user.value = sessionStorage.getItem('user');
     loadMaterials()
     loadDailyEntries()
     reportModal = new Modal(document.getElementById('reportModal'))
     editModal = new Modal(document.getElementById('editModal'))
 })
+
+
 </script>
 
 <style scoped>
