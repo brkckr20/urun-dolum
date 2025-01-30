@@ -10,7 +10,11 @@
           <router-link class="nav-link" to="/entry">✅ Girişler</router-link>
         </li>
       </ul>
-      <p class="text-white m-0">{{ user.toUpperCase() }}</p>
+      <div class="d-flex flex-row gap-2">
+        
+          <p class="text-white m-0">{{ user.toUpperCase() }}</p>
+          <router-link class="nav-link text-white border px-2 bg-danger" to="/">ÇIKIŞ</router-link>
+      </div>
     </div>
   </nav>
     <div class="container mt-4">

@@ -12,7 +12,10 @@
         <li class="nav-item">
         </li>
     </ul>
+    <div class="d-flex flex-row gap-2">        
         <p class="text-white m-0">{{ user.toUpperCase() }}</p>
+        <router-link class="nav-link text-white border px-2 bg-danger" to="/">ÇIKIŞ</router-link>
+    </div>
     </div>
 
 
