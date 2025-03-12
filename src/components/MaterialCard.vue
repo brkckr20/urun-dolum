@@ -32,6 +32,10 @@
                         <label class="form-label">Kullanıcı</label>
                         <input type="text" class="form-control" v-model="unit" required>
                     </div>  -->
+                    <div class="mb-3">
+                        <label class="form-label">Gram</label>
+                         <input type="text" class="form-control" v-model="gram" required>
+                    </div>
                     <button type="submit" class="btn btn-primary">Kaydet</button>
                 </form>
 
@@ -41,18 +45,18 @@
                         <thead>
                             <tr>
                                 <th>Malzeme Adı</th>
-                                <!-- <th>Kullanıcı</th> -->
+                                <th>Gram</th>
                                 <th>İşlemler</th>
                             </tr>
                         </thead>
                         <tbody style="font-size: 15px;">
                             <tr v-for="material in materials" :key="material.id">
                                 <td>{{ material.name }}</td>
-                                <!-- <td>{{ material.unit }}</td> -->
+                                <td>{{ material.gram }}</td>
                                 <td>
-                                    <button @click="editMaterial(material)" class="btn btn-sm btn-warning me-2"><i
+                                    <button @click="editMaterial(material)" class="btn btn-sm p-1 btn-warning me-2"><i
                                             class="bi bi-pencil-fill"></i></button>
-                                    <button @click="deleteMaterial(material.id)" class="btn btn-sm btn-danger"><i
+                                    <button @click="deleteMaterial(material.id)" class="btn p-1 btn-sm btn-danger"><i
                                             class="bi bi-trash-fill"></i></button>
                                 </td>
                             </tr>
@@ -74,6 +78,7 @@ import { useLoading } from '../composables/loading'
 const toast = useToast()
 const materialName = ref('')
 const unit = ref('')
+const gram = ref('')
 const materials = ref([])
 const editMode = ref(false)
 const currentId = ref(null)
@@ -85,7 +90,8 @@ const handleSubmit = async () => {
             if (editMode.value) {
                 await updateDoc(doc(db, 'materials', currentId.value), {
                     name: materialName.value,
-                    unit: user.value
+                    unit: user.value,
+                    gram: gram.value
                 })
                 toast.success('Malzeme güncellendi')
 
@@ -100,6 +106,7 @@ const handleSubmit = async () => {
 
             materialName.value = ''
             unit.value = ''
+            gram.value = ''
             editMode.value = false
             loadMaterials()
         } catch (error) {
@@ -135,6 +142,7 @@ const editMaterial = (material) => {
     unit.value = material.unit
     editMode.value = true
     currentId.value = material.id
+    gram.value = material.gram
 }
 
 onMounted(() => {
