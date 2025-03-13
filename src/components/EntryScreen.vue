@@ -64,7 +64,7 @@
                             <tr>
                                 <th>Malzeme</th>
                                 <th>Miktar</th>
-                                <th>KG</th>
+                                <!-- <th>KG</th> -->
                                 <th>Sil</th>
                             </tr>
                         </thead>
@@ -72,7 +72,7 @@
                             <tr v-for="entry in dailyEntries" :key="entry.id">
                                 <td>{{ entry.materialName }}</td>
                                 <td>{{ entry.quantity }}</td>
-                                <td>{{ entry.gram * entry.quantity / 1000 }}</td>
+                                <!-- <td>{{ entry.gram && entry.quantity ? (entry.gram * entry.quantity / 1000) : '' }}</td> -->
                                 <td>
                                     <button @click="editEntry(entry)" class="btn btn-sm btn-warning me-2">
                                         <i class="bi bi-pencil"></i>
