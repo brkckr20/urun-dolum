@@ -1,22 +1,22 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary"
-    style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
-    <div class=" container">
-      <ul class="navbar-nav d-flex flex-row gap-2">
-        <li class="nav-item">
-          <router-link class="nav-link" to="/materials">🗂️ Ürünler</router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" to="/entry">✅ Girişler</router-link>
-        </li>
-      </ul>
-      <div class="d-flex flex-row gap-2">
-        
-          <p class="text-white m-0">{{ user.toUpperCase() }}</p>
-          <router-link class="nav-link text-white border px-2 bg-danger" to="/">ÇIKIŞ</router-link>
-      </div>
-    </div>
-  </nav>
+        style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+        <div class=" container">
+            <ul class="navbar-nav d-flex flex-row gap-2">
+                <li class="nav-item">
+                    <router-link class="nav-link" to="/materials">🗂️ Ürünler</router-link>
+                </li>
+                <li class="nav-item">
+                    <router-link class="nav-link" to="/entry">✅ Girişler</router-link>
+                </li>
+            </ul>
+            <div class="d-flex flex-row gap-2">
+
+                <p class="text-white m-0">{{ user.toUpperCase() }}</p>
+                <router-link class="nav-link text-white border px-2 bg-danger" to="/">ÇIKIŞ</router-link>
+            </div>
+        </div>
+    </nav>
     <div class="container mt-4">
         <div class="card p-0">
             <div class="card-header">
@@ -28,13 +28,9 @@
                         <label class="form-label">Malzeme Adı</label>
                         <input type="text" class="form-control" v-model="materialName" required>
                     </div>
-                    <!-- <div class="mb-3">
-                        <label class="form-label">Kullanıcı</label>
-                        <input type="text" class="form-control" v-model="unit" required>
-                    </div>  -->
                     <div class="mb-3">
                         <label class="form-label">Gram</label>
-                         <input type="text" class="form-control" v-model="gram" required>
+                        <input type="text" class="form-control" v-model="gram">
                     </div>
                     <button type="submit" class="btn btn-primary">Kaydet</button>
                 </form>

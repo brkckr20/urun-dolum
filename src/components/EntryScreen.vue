@@ -1,26 +1,26 @@
 <template>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary"
-    style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
-    <div class=" container">
-      <ul class="navbar-nav d-flex flex-row gap-2">
-        <li class="nav-item">
-          <router-link class="nav-link" to="/materials">🗂️ Ürünler</router-link>
-        </li>
-        <li class="nav-item">
-          <router-link class="nav-link" to="/entry">✅ Girişler</router-link>
-        </li>
-        <li class="nav-item">
-        </li>
-    </ul>
-    <div class="d-flex flex-row gap-2">        
-        <p class="text-white m-0">{{ user.toUpperCase() }}</p>
-        <router-link class="nav-link text-white border px-2 bg-danger" to="/">ÇIKIŞ</router-link>
-    </div>
-    </div>
+        style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
+        <div class=" container">
+            <ul class="navbar-nav d-flex flex-row gap-2">
+                <li class="nav-item">
+                    <router-link class="nav-link" to="/materials">🗂️ Ürünler</router-link>
+                </li>
+                <li class="nav-item">
+                    <router-link class="nav-link" to="/entry">✅ Girişler</router-link>
+                </li>
+                <li class="nav-item">
+                </li>
+            </ul>
+            <div class="d-flex flex-row gap-2">
+                <p class="text-white m-0">{{ user.toUpperCase() }}</p>
+                <router-link class="nav-link text-white border px-2 bg-danger" to="/">ÇIKIŞ</router-link>
+            </div>
+        </div>
 
 
 
-  </nav>
+    </nav>
     <div class="container mt-4">
         <div class="card p-0">
             <div class="card-header">
@@ -64,6 +64,7 @@
                             <tr>
                                 <th>Malzeme</th>
                                 <th>Miktar</th>
+                                <th>KG</th>
                                 <th>Sil</th>
                             </tr>
                         </thead>
@@ -71,6 +72,7 @@
                             <tr v-for="entry in dailyEntries" :key="entry.id">
                                 <td>{{ entry.materialName }}</td>
                                 <td>{{ entry.quantity }}</td>
+                                <td>{{ entry.gram * entry.quantity / 1000 }}</td>
                                 <td>
                                     <button @click="editEntry(entry)" class="btn btn-sm btn-warning me-2">
                                         <i class="bi bi-pencil"></i>
@@ -177,7 +179,8 @@ const { withLoading } = useLoading()
 const editForm = ref({
     id: null,
     materialId: '',
-    quantity: ''
+    quantity: '',
+    gram: 0
 })
 
 let editModal = null
@@ -189,15 +192,6 @@ const formatDate = (date) => {
         year: 'numeric'
     }).format(date)
 }
-
-/* const formatTime = (timestamp) => {
-    if (!timestamp) return ''
-    const date = timestamp.toDate()
-    return new Intl.DateTimeFormat('tr-TR', {
-        hour: '2-digit',
-        minute: '2-digit'
-    }).format(date)
-} */
 
 const changeDate = (days) => {
     const newDate = new Date(selectedDate.value)
@@ -220,19 +214,40 @@ const loadDailyEntries = async () => {
                 where('date', '<=', Timestamp.fromDate(endOfDay))
             )
 
+            // Günlük kayıtları al
             const querySnapshot = await getDocs(q)
-            dailyEntries.value = querySnapshot.docs.map(doc => ({
+            const entries = querySnapshot.docs.map(doc => {
+                const data = doc.data()
+                return {
+                    id: doc.id,
+                    ...data
+                }
+            }).filter(entry => entry.unit === user.value)
+
+            // Malzemeleri yükle
+            const materialsSnapshot = await getDocs(collection(db, 'materials'))
+            const materials = materialsSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }))
-            .filter(entry => entry.unit === user.value)
+
+            // Her kaydın malzeme adı ile eşleşen gram bilgilerini al
+            const entriesWithGram = entries.map(entry => {
+                const material = materials.find(m => m.name === entry.materialName) // Malzeme adına göre eşleşme
+                return {
+                    ...entry,
+                    gram: material ? material.gram : 0 // Eğer malzeme bulunursa gram bilgisini al, yoksa 0
+                }
+            })
+
+            dailyEntries.value = entriesWithGram
         } catch (error) {
             toast.error('Kayıtlar yüklenirken bir hata oluştu')
             console.log(error);
-            
         }
     })
 }
+
 
 const loadMaterials = async () => {
     const q = query(
@@ -240,10 +255,10 @@ const loadMaterials = async () => {
         where('unit', '==', user.value)  // 'user' alanı, user.value ile eşit olanları getir
     )
     const querySnapshot = await getDocs(q)
-        materials.value = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-  }))
+    materials.value = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+    }))
 }
 
 const saveEntry = async () => {
@@ -255,7 +270,7 @@ const saveEntry = async () => {
                 materialName: material.name,
                 quantity: Number(quantity.value),
                 date: Timestamp.fromDate(new Date()),
-                unit: user.value
+                unit: user.value,
             })
 
 
@@ -271,31 +286,36 @@ const saveEntry = async () => {
 
 // Rapor oluşturma computed property
 const generateReport = computed(() => {
-    //const date = formatDate(selectedDate.value)
-    //let report = `${date}\n\n`
-    let report = ''
-    // Malzemeleri grupla
+    let report = '';
+
+    // Malzemeleri ve gramajı grupla
     const groupedEntries = dailyEntries.value.reduce((acc, entry) => {
         if (!acc[entry.materialName]) {
-            acc[entry.materialName] = 0
+            acc[entry.materialName] = { totalQuantity: 0, totalGrams: 0 };
         }
-        acc[entry.materialName] += entry.quantity
-        return acc
-    }, {})
+        // Miktarları artırırken, gramları her ürün için çarpıyoruz
+        acc[entry.materialName].totalQuantity += entry.quantity ?? 0;
+        acc[entry.materialName].totalGrams += (entry.quantity ?? 0) * (entry.gram ?? 0); // Adet ile gramı çarpıyoruz
+
+        return acc;
+    }, {});
 
     // Gruplanmış verileri rapora ekle
-    Object.entries(groupedEntries).forEach(([material, total]) => {
-        report += `✅${total} adet ${material} dolduruldu\n`
-    })
+    Object.entries(groupedEntries).forEach(([material, data]) => {
+        //console.log(`Malzeme: ${material}, Toplam Gram: ${data.totalGrams}`); // Test için log
+        report += `✅${data.totalQuantity} adet ${material} dolduruldu\n`;
+    });
+
+    // Genel toplamları hesapla
+    const totalQuantity = Object.values(groupedEntries).reduce((sum, item) => sum + item.totalQuantity, 0);
+    const totalGrams = Object.values(groupedEntries).reduce((sum, item) => sum + item.totalGrams, 0);
 
     // En alta transfer mesajını ekle
-    const totalQuantity = Object.values(groupedEntries).reduce((sum, qty) => sum + qty, 0)
-    report += `\n✅Ürünler sisteme girildi transfer yapıldı`
-    report += `\n✅${totalQuantity} adet epoksi dolduruldu`
+    report += `\n✅Ürünler sisteme girildi transfer yapıldı`;
+    report += `\n✅${totalQuantity} adet epoksi dolduruldu (${totalGrams / 1000} kg)`;
 
-    return report
-})
-
+    return report;
+});
 // Modal'ı göster
 const showReportModal = () => {
     if (!reportModal) {
