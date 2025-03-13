@@ -312,7 +312,8 @@ const generateReport = computed(() => {
 
     // En alta transfer mesajını ekle
     report += `\n✅Ürünler sisteme girildi transfer yapıldı`;
-    report += `\n✅${totalQuantity} adet epoksi dolduruldu (${totalGrams / 1000} kg)`;
+    report += `\n✅${totalQuantity} adet epoksi dolduruldu.`;
+    report += `\n✅${totalGrams / 1000} kilo epoksi dolduruldu.`;
 
     return report;
 });
