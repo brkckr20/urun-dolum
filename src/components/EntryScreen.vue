@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary"
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success"
         style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;">
         <div class=" container">
             <ul class="navbar-nav d-flex flex-row gap-2">
@@ -9,28 +9,25 @@
                 <li class="nav-item">
                     <router-link class="nav-link" to="/entry">✅ Girişler</router-link>
                 </li>
-                <li class="nav-item">
-                </li>
             </ul>
-            <div class="d-flex flex-row gap-2">
+            <div class="d-flex flex-row gap-2" style="font-size:13px">
+                <p class="text-white m-0">{{ epoxyOrPaint }}</p>
+                <span class="text-white"> - </span>
                 <p class="text-white m-0">{{ user.toUpperCase() }}</p>
                 <router-link class="nav-link text-white border px-2 bg-danger" to="/">ÇIKIŞ</router-link>
             </div>
         </div>
-
-
-
     </nav>
     <div class="container mt-4">
         <div class="card p-0">
-            <div class="card-header">
+            <div class="card-header p-1">
                 <div class="d-flex justify-content-between align-items-center gap-2">
-                    <button class="btn btn-outline-primary " @click="changeDate(-1)">
+                    <button class="btn btn-sm btn-outline-primary " @click="changeDate(-1)">
                         < </button>
-                            <h4 class="mb-0">
+                            <h4 class="mb-0 fs-6">
                                 {{ formatDate(selectedDate) }}
                             </h4>
-                            <button class="btn btn-outline-primary" @click="changeDate(1)">
+                            <button class="btn btn-sm btn-outline-primary" @click="changeDate(1)">
                                 >
                             </button>
                 </div>
@@ -38,38 +35,41 @@
             <div class="card-body">
                 <div class="mb-4">
                     <div style="max-height: 200px; overflow-y: auto;">
-                        <div v-for="material in materials" :key="material.id" class="form-check mb-2">
-                            <input class="form-check-input" type="radio" :id="material.id" :value="material.id"
-                                v-model="selectedMaterial" name="materialRadio">
-                            <label class="form-check-label" :for="material.id">
-                                {{ material.name }}<!--  ({{ material.unit }}) -->
-                            </label>
+                        <div class="row">
+                            <div v-for="material in materials" :key="material.id" class="form-check mb-2 col-6">
+                                <input class="form-check-input" type="radio" :id="material.id" :value="material.id"
+                                    v-model="selectedMaterial" name="materialRadio">
+                                <label class="form-check-label" :for="material.id">
+                                    {{ material.name }}
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Miktar</label>
-                    <input type="number" class="form-control" v-model="quantity" required>
+                <div class="row mb-3">
+                    <div class="col-9">
+                        <label class="form-label">Miktar</label>
+                        <input type="number" class="form-control form-control-sm" v-model="quantity" required>
+                    </div>
+                    <div class="col-3 d-flex align-items-end">
+                        <button @click="saveEntry" class="btn btn-sm btn-primary"
+                            :disabled="!selectedMaterial || !quantity">
+                            Kaydet
+                        </button>
+                    </div>
                 </div>
-
-                <button @click="saveEntry" class="btn btn-primary" :disabled="!selectedMaterial || !quantity">
-                    Kaydet
-                </button>
-
                 <div class="mt-4">
-                    <h6>Günlük Kayıtlar</h6>
-                    <table class="table">
+                    <h6 class="text-white bg-info">Günlük Kayıtlar</h6>
+                    <table class="table table-sm table-striped">
                         <thead>
                             <tr>
                                 <th>Malzeme</th>
                                 <th>Miktar</th>
-                                <!-- <th>KG</th> -->
                                 <th>Sil</th>
                             </tr>
                         </thead>
                         <tbody class="table-group-divider" style="font-size: 15px;">
-                            <tr v-for="entry in dailyEntries" :key="entry.id">
+                            <tr style="font-size: 13px;" v-for="entry in dailyEntries" :key="entry.id">
                                 <td>{{ entry.materialName }}</td>
                                 <td>{{ entry.quantity }}</td>
                                 <!-- <td>{{ entry.gram && entry.quantity ? (entry.gram * entry.quantity / 1000) : '' }}</td> -->
@@ -86,7 +86,7 @@
                     </table>
                 </div>
                 <div class="text-end mt-3">
-                    <button class="btn btn-info text-white" @click="showReportModal">
+                    <button class="btn btn-info text-white btn-sm" @click="showReportModal">
                         <i class="bi bi-clipboard-data"></i> Rapor
                     </button>
                 </div>
@@ -173,6 +173,7 @@ const dailyEntries = ref([])
 const reportText = ref(null)
 let reportModal = null
 const user = ref('');
+const epoxyOrPaint = ref('');
 const { withLoading } = useLoading()
 
 // Düzenleme formu için state
@@ -250,9 +251,11 @@ const loadDailyEntries = async () => {
 
 
 const loadMaterials = async () => {
+    let boyami = sessionStorage.getItem('paintOrEpoxy') === "paint" ? "Boya" : "Epoksi";
     const q = query(
         collection(db, 'materials'),
-        where('unit', '==', user.value)  // 'user' alanı, user.value ile eşit olanları getir
+        where('unit', '==', user.value),
+        where('paintOrEpoxy', '==', boyami),
     )
     const querySnapshot = await getDocs(q)
     materials.value = querySnapshot.docs.map(doc => ({
@@ -272,8 +275,6 @@ const saveEntry = async () => {
                 date: Timestamp.fromDate(new Date()),
                 unit: user.value,
             })
-
-
             toast.success('Giriş kaydedildi')
             selectedMaterial.value = null
             quantity.value = ''
@@ -302,7 +303,6 @@ const generateReport = computed(() => {
 
     // Gruplanmış verileri rapora ekle
     Object.entries(groupedEntries).forEach(([material, data]) => {
-        //console.log(`Malzeme: ${material}, Toplam Gram: ${data.totalGrams}`); // Test için log
         report += `✅${data.totalQuantity} adet ${material} dolduruldu\n`;
     });
 
@@ -312,11 +312,46 @@ const generateReport = computed(() => {
 
     // En alta transfer mesajını ekle
     report += `\n✅Ürünler sisteme girildi transfer yapıldı`;
-    report += `\n✅${totalQuantity} adet epoksi dolduruldu.`;
-    report += `\n✅${totalGrams / 1000} kilo epoksi dolduruldu.`;
+
+    if (sessionStorage.getItem('paintOrEpoxy') === "epoxy") {
+        report += `\n✅${totalQuantity} adet epoksi dolduruldu.`;
+        report += `\n✅${totalGrams / 1000} kilo epoksi dolduruldu.`;
+    } else {
+        // Sıvı ve toz boya gruplarını ayırıyoruz
+        let liquidPaintQuantity = 0;
+        let liquidPaintGrams = 0;
+        let powderPaintQuantity = 0;
+        let powderPaintGrams = 0;
+
+        // Malzemeleri sıvı boya ve toz boya olarak ayır
+        Object.entries(groupedEntries).forEach(([material, data]) => {
+            if (material.toLowerCase().includes("sıvı boya")) {
+                // Her sıvı boya için 30 gram hesapla
+                liquidPaintQuantity += data.totalQuantity;
+                liquidPaintGrams += data.totalQuantity * 30; // Her bir sıvı boya 30 gram
+            } else if (material.toLowerCase().includes("toz boya")) {
+                // Her toz boya için gramajı toplama
+                powderPaintQuantity += data.totalQuantity;
+                powderPaintGrams += data.totalQuantity * 10; // Toz boyanın gramajını olduğu gibi al
+            }
+        });
+
+        // Sıvı boya için rapor
+        if (liquidPaintQuantity > 0) {
+            report += `\n✅${liquidPaintQuantity} adet sıvı boya dolduruldu.`;
+            report += `\n✅${liquidPaintGrams} gram sıvı boya dolduruldu.`;
+        }
+
+        // Toz boya için rapor
+        if (powderPaintQuantity > 0) {
+            report += `\n✅${powderPaintQuantity} adet toz boya dolduruldu.`;
+            report += `\n✅${powderPaintGrams} gram toz boya dolduruldu.`;
+        }
+    }
 
     return report;
 });
+
 // Modal'ı göster
 const showReportModal = () => {
     if (!reportModal) {
@@ -396,6 +431,7 @@ watch(selectedDate, () => {
 
 onMounted(() => {
     user.value = sessionStorage.getItem('user');
+    epoxyOrPaint.value = sessionStorage.getItem('paintOrEpoxy') === "paint" ? "Boya" : "Epoksi";
     loadMaterials()
     loadDailyEntries()
     reportModal = new Modal(document.getElementById('reportModal'))
