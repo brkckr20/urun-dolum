@@ -14,7 +14,7 @@
                 <p class="text-white m-0">{{ epoxyOrPaint }}</p>
                 <span class="text-white"> - </span>
                 <p class="text-white m-0">{{ user.toUpperCase() }}</p>
-                <router-link class="nav-link text-white border px-2 bg-danger" to="/">ÇIKIŞ</router-link>
+                <router-link class="nav-link text-white border px-2 bg-danger" to="/">Çıkış</router-link>
             </div>
         </div>
     </nav>
@@ -27,7 +27,7 @@
             <div class="card-body">
                 <form class="row gap" @submit.prevent="handleSubmit">
                     <div class="mb-3 col-4">
-                        <label class="form-label">Malzeme Adı</label>
+                        <label class="form-label">Ürün</label>
                         <input type="text" class="form-control form-control-sm" v-model="materialName" required>
                     </div>
                     <div class="mb-3 col-3">
@@ -35,11 +35,11 @@
                         <input type="text" class="form-control form-control-sm" v-model="gram">
                     </div>
                     <div class="mb-3 col-3">
-                        <label class="form-label">Boya/Epoksi</label>
+                        <label class="form-label">Tür</label>
                         <input type="text" class="form-control form-control-sm" v-model="paintOrEpoxy">
                     </div>
                     <div class="col-2 d-flex align-items-center mt-3 justify-content-center">
-                        <button type="submit" class="btn btn-sm btn-success">Kaydet</button>
+                        <button type="submit" class="btn btn-sm btn-success">Kayıt</button>
                     </div>
                 </form>
             </div>

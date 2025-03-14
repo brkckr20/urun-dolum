@@ -14,7 +14,7 @@
                 <p class="text-white m-0">{{ epoxyOrPaint }}</p>
                 <span class="text-white"> - </span>
                 <p class="text-white m-0">{{ user.toUpperCase() }}</p>
-                <router-link class="nav-link text-white border px-2 bg-danger" to="/">ÇIKIŞ</router-link>
+                <router-link class="nav-link text-white border px-2 bg-danger" to="/">Çıkış</router-link>
             </div>
         </div>
     </nav>
